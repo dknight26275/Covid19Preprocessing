@@ -12,6 +12,12 @@ analysis later.
 (I need to find vacination data to add in.... https://github.com/govex/COVID-19.git)
 
 ## DataCleaning.py
+#### Look up tables
+IUD_ISO LUT in CSSE Repo contains iso3 code, longitude, latitude and population
+data \
+
+A second continent LUT from https://statisticstimes.com/geography/countries-by-continents.php
+has iso3 codes and continent data.
 #### Covid_Raw df
 Iterate through files in JHU Repo, extract Date, province/State, 
 Country, deaths and active case numbers. 

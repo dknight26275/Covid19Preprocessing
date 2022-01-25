@@ -34,19 +34,25 @@ except:
     print('Git pull failed')
 
 #%%
+# Data for Lat, Long, Population and continent are taken from 2 separate LUT, which can be joined on iso3 code
 
-# load IUD Lookup table into DF for extraction of population, Lat and Long values
-lut_df = pd.read_csv(LUT_filepath + '/UID_ISO_FIPS_LookUp_Table.csv')
+# load IUD Lookup table from CSSE Repo into DF for extraction of population, Lat and Long values
+lut_df = pd.read_csv('H:/COVID-19/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv')
+
+# load continent lut from https://statisticstimes.com/geography/countries-by-continents.php
+continent_lut = pd.read_csv('H:/Covid19Dashboard/continent_lut.csv', usecols=['iso3','Continent'])
 
 # need the Combined Key for joining, then population, lat and long
 lut_df = lut_df.rename(columns={'Long_': 'Long'})
-lut_df = lut_df[['Combined_Key', 'Population', 'Lat', 'Long']]
+lut_df = lut_df[['iso3','Combined_Key', 'Population', 'Lat', 'Long']]
 
 # A typo in the 'Northwest Territories, Canada' entry of the LUT needs to be fixed to get the populations for
 # that region (add a space after the comma)
-# lut_df[lut_df['Combined_Key']=='Northwest Territories,Canada'].index
-lut_df.iloc[762, 0] = 'Northwest Territories, Canada'
+nwt_index = lut_df[lut_df['Combined_Key']=='Northwest Territories,Canada'].index
+lut_df.iloc[nwt_index, 0] = 'Northwest Territories, Canada'
 
+# join continent lut on iso3 code
+lut_df = lut_df.join(continent_lut.set_index('iso3'), on='iso3')
 #%%
 # Iterate through files in csse_daily_reports and generate extract data to Covid_raw_df (see Preprocessing_readme.md)
 
@@ -87,8 +93,7 @@ for file in os.listdir(daily_reports_filepath):
         # add data to covid_raw df
         covid_raw = pd.concat([covid_raw, filedb], ignore_index=True, copy=False)
 #%%
-print(covid_raw.head())
-#%%
+
 # Clean the Covid raw table to remove rows with no Lat/Long value in the population LUT (see Preprocessing_readme.md)
 
 '''Start by excluding cases reported on cruise ships  ~4000 rows, and ~200-300 cases
@@ -165,8 +170,8 @@ rows_to_drop = list(covid_cleaned[covid_cleaned['Lat'].isna()].index)
 covid_cleaned = covid_cleaned.drop(index=rows_to_drop)
 
 # arrange cols to match the sql Table
-final_column_order = ['Date', 'Province_State', 'Country_Region', 'Lat', 'Long', 'Confirmed', 'Deaths', 'Active',
-                      'Combined_Key', 'Population', 'Incidence_Rate', 'Case_Fatality_pc']
+final_column_order = ['Date', 'Province_State', 'Country_Region', 'Continent', 'Lat', 'Long', 'Confirmed', 'Deaths',
+                      'Active', 'Combined_Key', 'Population', 'Incidence_Rate', 'Case_Fatality_pc']
 
 covid_cleaned = covid_cleaned[final_column_order]
 
