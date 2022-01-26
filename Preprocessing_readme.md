@@ -29,12 +29,13 @@ Clean the Covid raw table to remove rows with no Lat/Long
 values in the population LUT. \
 concat Province_State with Country_Region to create \
 Combined_key column \
-Join LUT on combined_key to get Lat, Long and population values. \
+Join LUT on combined_key to get Continent, Lat, Long and population values. \
 Add Incidence_rate column (Number of cases /100,000 population) \
 Add Case_Fatality_pc column (Deaths / Confirmed (*100))
 
 #### Country_daily df
-Group Covid Cleaned by Country and Date to get values for each date.\
+Group Covid Cleaned by Date, Country and Continent to get values for each date. 
+Calculate sum of cases and deaths on each date. \
 Add columns for New cases and New Deaths each day
 
 #### Country_latest df

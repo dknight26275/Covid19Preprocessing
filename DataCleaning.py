@@ -184,8 +184,8 @@ country_daily = covid_cleaned.copy()
 # convert Date column to datetime
 country_daily.loc[:, 'Date'] = pd.to_datetime(country_daily.Date)  # might not need this....
 # sort by date and Country, calculate sum of confirmed, deaths and active cases
-country_daily = country_daily[['Date', 'Country_Region', 'Confirmed', 'Deaths', 'Active']].groupby(
-    ['Date', 'Country_Region'], as_index=False).agg({'Confirmed': 'sum', 'Deaths': 'sum', 'Active': 'sum'}).sort_values(
+country_daily = country_daily[['Date', 'Country_Region', 'Continent', 'Confirmed', 'Deaths', 'Active']].groupby(
+    ['Date', 'Country_Region','Continent'], as_index=False).agg({'Confirmed': 'sum','Deaths': 'sum','Active': 'sum'}).sort_values(
     ['Country_Region', 'Date'], ignore_index=True)
 
 # add columns for New_cases and New_deaths
@@ -197,6 +197,7 @@ country_daily.loc[:, 'New_deaths'] = country_daily.sort_values(['Country_Region'
                                                                ).groupby(['Country_Region']
                                                                          )['Deaths'].apply(lambda x: x - x.shift(1))
 
+#%%
 # group by country to get country_latest df with latest value for each country
 
 # import base columns from country_daily
@@ -237,6 +238,7 @@ country_latest = country_latest.join(tempdf.set_index('Country_Region'), on='Cou
 # calculate 1 month change
 country_latest.loc[:, 'New_cases_last_month'] = (country_latest['Confirmed'] - country_latest['Confirmed_last_month'])
 country_latest.loc[:, 'New_deaths_last_month'] = (country_latest['Deaths'] - country_latest['Deaths_last_month'])
+
 
 #%%
 # daily_total df = Group all country data together to get a single set of values for each date
