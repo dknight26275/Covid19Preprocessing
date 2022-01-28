@@ -34,9 +34,14 @@ Add Incidence_rate column (Number of cases /100,000 population) \
 Add Case_Fatality_pc column (Deaths / Confirmed (*100))
 
 #### Country_daily df
-Group Covid Cleaned by Date, Country and Continent to get values for each date. 
+Start with copy of covid_cleaned \
+sorty by date, and Province_state so that when grouping by country, all provinces of the
+country will have the correct continent value (for example, Reunion, France will appear in Europe
+instead of Africa)
+Group by Date, Country to get values for each date. \
+Get last continent value for each country \
 Calculate sum of cases and deaths on each date. \
-Add columns for New cases and New Deaths each day
+Add columns for New cases and New Deaths each day 
 
 #### Country_latest df
 Group by country to get current values for each country, 

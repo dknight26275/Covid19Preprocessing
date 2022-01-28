@@ -15,7 +15,6 @@ pd.set_option('mode.chained_assignment', None)
 daily_reports_filepath = 'H:/COVID-19/csse_covid_19_data/csse_covid_19_daily_reports'
 # daily_reports_filepath_us = 'H:/COVID-19/csse_covid_19_data/csse_covid_19_daily_reports_us'
 # time_series_filepath = 'H:/COVID-19/csse_covid_19_data/csse_covid_19_time_series'
-LUT_filepath = 'H:/COVID-19/csse_covid_19_data'
 processed_files_filepath = 'H:/Covid19Dashboard'
 
 #%%
@@ -40,7 +39,7 @@ except:
 lut_df = pd.read_csv('H:/COVID-19/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv')
 
 # load continent lut from https://statisticstimes.com/geography/countries-by-continents.php
-continent_lut = pd.read_csv('H:/Covid19Dashboard/continent_lut.csv', usecols=['iso3','Continent'])
+continent_lut = pd.read_csv('H:/CovidPreprocessing/continent_lut.csv', usecols=['iso3','Continent'])
 
 # need the Combined Key for joining, then population, lat and long
 lut_df = lut_df.rename(columns={'Long_': 'Long'})
@@ -158,12 +157,12 @@ covid_cleaned.loc[:, 'Combined_Key'] = np.where(
 
 # join lut with covid cleaned to  get population, Lat and Long data
 covid_cleaned = covid_cleaned.join(lut_df.set_index('Combined_Key'), on='Combined_Key')
-
+#
 # add incidence rate and case fatality % columns
 covid_cleaned.loc[:, 'Incidence_Rate'] = covid_cleaned['Confirmed'] / (covid_cleaned['Population'] / 100000)
 covid_cleaned.loc[:, 'Case_Fatality_pc'] = covid_cleaned['Deaths'] / covid_cleaned['Confirmed'] * 100
 
-'''Despite cleaning, a small number of rows still lack Lat/Long values. Due to the small number of rows, and 
+'''Despite cleaning, a small number of rows still lack Lat/Long values. Due to the small number of rows, and
 small numbers of cases in those rows, these will be dropped from the covid_cleaned'''
 # drop remaining rows where lat isna
 rows_to_drop = list(covid_cleaned[covid_cleaned['Lat'].isna()].index)
@@ -180,13 +179,17 @@ covid_cleaned = covid_cleaned[final_column_order]
 
 # import base columns from covid_cleaned
 country_daily = covid_cleaned.copy()
-
+#sort by date then Province so grouping works
+country_daily = country_daily.sort_values(by=['Date','Province_State'])
 # convert Date column to datetime
-country_daily.loc[:, 'Date'] = pd.to_datetime(country_daily.Date)  # might not need this....
+# country_daily.loc[:, 'Date'] = pd.to_datetime(country_daily.Date)  # might not need this....
 # sort by date and Country, calculate sum of confirmed, deaths and active cases
 country_daily = country_daily[['Date', 'Country_Region', 'Continent', 'Confirmed', 'Deaths', 'Active']].groupby(
-    ['Date', 'Country_Region','Continent'], as_index=False).agg({'Confirmed': 'sum','Deaths': 'sum','Active': 'sum'}).sort_values(
-    ['Country_Region', 'Date'], ignore_index=True)
+    ['Date', 'Country_Region'], as_index=False).agg({
+    'Continent':'last',
+    'Confirmed': 'sum',
+    'Deaths': 'sum',
+    'Active': 'sum'}).sort_values(['Country_Region', 'Date'], ignore_index=True)
 
 # add columns for New_cases and New_deaths
 country_daily.loc[:, 'New_cases'] = country_daily.sort_values(['Country_Region', 'Date']
