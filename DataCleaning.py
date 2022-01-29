@@ -174,6 +174,7 @@ final_column_order = ['Date', 'Province_State', 'Country_Region', 'Continent', '
 
 covid_cleaned = covid_cleaned[final_column_order]
 
+
 #%%
 # Group Covid Cleaned by Country and Date to get values for each date, calculate New cases and Deaths each day
 
@@ -250,7 +251,7 @@ country_latest.loc[:, 'New_deaths_last_month'] = (country_latest['Deaths'] - cou
 daily_total = country_daily.copy()
 
 # group by date, calculate sum of cases, deaths
-daily_total = daily_total[['Date', 'Confirmed', 'Deaths', 'Active', 'New_cases']].groupby('Date').sum()
+daily_total = daily_total[['Date', 'Confirmed', 'Deaths', 'Active', 'New_cases', 'New_deaths']].groupby('Date').sum()
 # add deaths/100 cases column
 daily_total.loc[:, 'Deaths_per_100'] = daily_total['Deaths'] / (daily_total['Confirmed'] / 100)
 
