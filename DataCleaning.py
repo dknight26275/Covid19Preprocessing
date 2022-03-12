@@ -183,11 +183,11 @@ country_daily = covid_cleaned.copy()
 #sort by date then Province so grouping works
 country_daily = country_daily.sort_values(by=['Date','Province_State'])
 # convert Date column to datetime
-# country_daily.loc[:, 'Date'] = pd.to_datetime(country_daily.Date)  # might not need this....
+
 # sort by date and Country, calculate sum of confirmed, deaths and active cases
-country_daily = country_daily[['Date', 'Country_Region', 'Continent', 'Confirmed', 'Deaths', 'Active']].groupby(
+country_daily = country_daily[['Date', 'Country_Region', 'Confirmed', 'Deaths', 'Active']].groupby(
     ['Date', 'Country_Region'], as_index=False).agg({
-    'Continent':'last',
+    # 'Continent':'last',
     'Confirmed': 'sum',
     'Deaths': 'sum',
     'Active': 'sum'}).sort_values(['Country_Region', 'Date'], ignore_index=True)
@@ -201,6 +201,9 @@ country_daily.loc[:, 'New_deaths'] = country_daily.sort_values(['Country_Region'
                                                                ).groupby(['Country_Region']
                                                                          )['Deaths'].apply(lambda x: x - x.shift(1))
 
+# get population data from lookuptable
+country_daily = country_daily.join(lut_df.set_index('Combined_Key'), on='Country_Region')
+country_daily = country_daily.sort_values(['Country_Region', 'Date'])
 #%%
 # group by country to get country_latest df with latest value for each country
 
