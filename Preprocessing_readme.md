@@ -87,7 +87,6 @@ Final columns:
 - Confirmed
 - Deaths
 - Active
-- New_cases
 - Deaths_per_100
 - iso3
 - population
@@ -95,14 +94,14 @@ Final columns:
 - Long
 - Continent
 - Cases_per_million
-- Confirmed_last_week
-- Deaths_last_week
-- New_cases_last_week
-- New_deaths_last_week
-- Confirmed_last_month
-- Deaths_last_month
-- New_cases_last_month
-- New_deaths_last_month
+- Confirmed_last_week (number of cases 1 week ago)
+- Deaths_last_week (number of deaths 1 week ago)
+- New_cases_last_week (number of cases reported in the last week)
+- New_deaths_last_week (number of deaths reported in the last week)
+- Confirmed_last_month (number of cases 1 month ago)
+- Deaths_last_month (number of deaths 1 month ago)
+- New_cases_last_month (number of cases reported in the last month)
+- New_deaths_last_month (number of deaths reported in the last month)
 
 #### Daily_total df
 Starting from country_daily, group all country data together 

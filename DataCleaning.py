@@ -91,6 +91,8 @@ for file in os.listdir(daily_reports_filepath):
 
         # add data to covid_raw df
         covid_raw = pd.concat([covid_raw, filedb], ignore_index=True, copy=False)
+
+print('Covid_raw_df complete')
 #%%
 
 # Clean the Covid raw table to remove rows with no Lat/Long value in the population LUT (see Preprocessing_readme.md)
@@ -174,7 +176,7 @@ final_column_order = ['Date', 'Province_State', 'Country_Region', 'Continent', '
 
 covid_cleaned = covid_cleaned[final_column_order]
 
-
+print('Covid_cleaned_df complete')
 #%%
 # Group Covid Cleaned by Country and Date to get values for each date, calculate New cases and Deaths each day
 
@@ -192,7 +194,7 @@ country_daily = country_daily[['Date', 'Country_Region', 'Confirmed', 'Deaths', 
     'Deaths': 'sum',
     'Active': 'sum'}).sort_values(['Country_Region', 'Date'], ignore_index=True)
 
-# add columns for New_cases and New_deaths
+# add columns for New_cases and New_deaths (new cases/deaths since last reported date)
 country_daily.loc[:, 'New_cases'] = country_daily.sort_values(['Country_Region', 'Date']
                                                               ).groupby(['Country_Region']
                                                                         )['Confirmed'].apply(lambda x: x - x.shift(1))
@@ -204,6 +206,8 @@ country_daily.loc[:, 'New_deaths'] = country_daily.sort_values(['Country_Region'
 # get population data from lookuptable
 country_daily = country_daily.join(lut_df.set_index('Combined_Key'), on='Country_Region')
 country_daily = country_daily.sort_values(['Country_Region', 'Date'])
+
+print('Country_daily_df complete')
 #%%
 # group by country to get country_latest df with latest value for each country
 
@@ -211,7 +215,7 @@ country_daily = country_daily.sort_values(['Country_Region', 'Date'])
 country_latest = country_daily.copy()
 
 # select columns to import from covid_cleaned
-columns_to_import = ['Country_Region', 'Confirmed', 'Deaths', 'Active', 'New_cases']
+columns_to_import = ['Country_Region', 'Confirmed', 'Deaths', 'Active',]
 # group by Country_region to get latest results for each country
 country_latest = country_latest[columns_to_import].groupby(['Country_Region'], as_index=False).last()
 # add deaths/100 cases column
@@ -246,7 +250,7 @@ country_latest = country_latest.join(tempdf.set_index('Country_Region'), on='Cou
 country_latest.loc[:, 'New_cases_last_month'] = (country_latest['Confirmed'] - country_latest['Confirmed_last_month'])
 country_latest.loc[:, 'New_deaths_last_month'] = (country_latest['Deaths'] - country_latest['Deaths_last_month'])
 
-
+print('country_latest_df complete')
 #%%
 # daily_total df = Group all country data together to get a single set of values for each date
 
@@ -270,6 +274,8 @@ tempdf.columns = ['No_countries']
 # join the temp df to daily_total on 'Date' column
 daily_total = daily_total.join(tempdf, on='Date')
 daily_total = daily_total.reset_index()
+
+print('daily_total_df complete')
 
 #%%
 # create csv files for each df
