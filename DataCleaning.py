@@ -279,7 +279,7 @@ print('daily_total_df complete')
 
 #%%
 # create csv files for each df
-covid_cleaned.to_csv(processed_files_filepath + '/covid_cleaned.csv')
+# covid_cleaned.to_csv(processed_files_filepath + '/covid_cleaned.csv')
 country_daily.to_csv(processed_files_filepath + '/country_daily.csv')
 country_latest.to_csv(processed_files_filepath + '/country_latest.csv')
 daily_total.to_csv(processed_files_filepath + '/daily_total.csv')
